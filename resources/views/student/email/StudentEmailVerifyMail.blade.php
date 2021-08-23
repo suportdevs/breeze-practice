@@ -1,5 +1,7 @@
+
+
 @component('mail::message')
-Hello {{$user->name}}
+Hello 
 
 
 Please click the button below to verify your email address.

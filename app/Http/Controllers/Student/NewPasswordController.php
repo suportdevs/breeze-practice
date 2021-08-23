@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student; 
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
-use App\Models\Student; 
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class NewPasswordController extends Controller
 {
@@ -32,33 +32,35 @@ class NewPasswordController extends Controller
        */
       public function submitResetPasswordForm(Request $request)
       {
-          $request->validate([
-              'email' => 'required|email|exists:students',
-              'password' => 'required|string|min:6|confirmed',
-              'password_confirmation' => 'required'
-          ]);
-  
-          $updatePassword = DB::table('password_resets')
-                              ->where([
-                                'email' => $request->email, 
-                                'token' => $request->token
-                              ])
-                              ->first();
+            $request->validate([
+                'email' => 'required|email|exists:students',
+                'password' => 'required|string|min:6|confirmed',
+                'password_confirmation' => 'required'
+            ]);
+    
+            $updatePassword = DB::table('password_resets')
+                                ->where([
+                                    'email' => $request->email, 
+                                    'token' => $request->token
+                                ])
+                                ->first();
   
         //   if($updatePassword){
         //     return back()->withInput()->with(['request' => $request]);
         //   }else 
-          if(!$updatePassword){
-              return back()->withInput($request->only('email'))
-                ->withErrors(['email' => __($status)]);
+            if(!$updatePassword){
+                return back()->withInput($request->only('email'))
+                    ->withErrors(['email' => __($status)]);
+            }
+            elseif($updatePassword){
+  
+                Student::where('email', $request->email)
+                            ->update(['password' => Hash::make($request->password)]);
+        
+                DB::table('password_resets')->where(['email'=> $request->email])->delete();
+        
+                return redirect('/student/login')->with('status', 'Your password has been changed!');
           }
-  
-          $user = Student::where('email', $request->email)
-                      ->update(['password' => Hash::make($request->password)]);
- 
-          DB::table('password_resets')->where(['email'=> $request->email])->delete();
-  
-          return redirect('/student/login')->with('status', 'Your password has been changed!');
       }
 
 

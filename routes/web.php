@@ -1,7 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// use Auth;
 
+use Illuminate\Support\Facades\URL;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Config;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,7 +31,7 @@ Route::get('/admin/dashboard', function () {
 
 Route::get('/student/dashboard', function () {
     return view('student.dashboard');
-})->middleware('student:student')->name('student.dashboard');
+})->middleware('student:student', 'verified')->name('student.dashboard');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';

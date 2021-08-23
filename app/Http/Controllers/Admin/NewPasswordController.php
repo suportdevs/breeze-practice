@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin; 
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
-use App\Models\Admin; 
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class NewPasswordController extends Controller
 {
@@ -22,6 +22,7 @@ class NewPasswordController extends Controller
      */
     public function create(Request $request)
     {
+        // dd($request);
         return view('admin.auth.reset-password', ['request' => $request]);
         // return view('admin.auth.reset-password')->with($request);
     }

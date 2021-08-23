@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
+use Auth;
 
 class EmailVerificationPromptController extends Controller
 {
@@ -16,8 +17,11 @@ class EmailVerificationPromptController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return $request->user()->hasVerifiedEmail()
-                    ? redirect()->intended(RouteServiceProvider::ADMINHOME)
-                    : view('admin.auth.verify-email');
+        if(Auth::guard('admin')->check()){
+            return $request->user()->hasVerifiedEmail()
+                        ? redirect()->intended(RouteServiceProvider::ADMINHOME)
+                        : view('admin.auth.verify-email');
+        }
+        
     }
 }

@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student; 
+use App\Mail\StudentPasswordResetMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use DB; 
-use Carbon\Carbon; 
-use App\Models\Student; 
-use Mail; 
-use Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
+use Carbon\Carbon;
 
 class PasswordResetLinkController extends Controller
 {
@@ -29,28 +30,32 @@ class PasswordResetLinkController extends Controller
        *
        * @return response()
        */
-      public function submitForgetPasswordForm(Request $request)
+      public function submitForgetPasswordLink(Request $request)
       {
-          $request->validate([
-              'email' => 'required|email|exists:students',
-          ]);
-  
-          $token = Str::random(64);
-  
-          DB::table('password_resets')->insert([
-            //   'email' => $request->_token, 
-              'email' => $request->email, 
-              'token' => $token, 
-              'created_at' => Carbon::now()
+            $request->validate([
+                'email' => 'required|email|exists:students',
             ]);
+    
+            $token = Str::random(64);
+    
+            DB::table('password_resets')->insert([
+                //   'email' => $request->_token, 
+                'email' => $request->email, 
+                'token' => $token, 
+                'created_at' => Carbon::now()
+                ]);
+            
+            $student = DB::table('password_resets')->where('token', $token)->first();
+            $url = url(route('student.password.reset', [
+                'token' => $student->token,
+                'email' => $request->email,
+            ], false));
+            // Student Auth expire count
+            $count = Config::get('student.passwords.'.Config::get('student.defaults.passwords').'.expire', 60);
 
-          Mail::send('student.email.forget-password', ['token' => $token], function($message) use($request){
-              $message->to($request->email);
-              $message->subject('Reset Password Notification');
-              
-          });
-  
-          return back()->with('status', 'We have e-mailed your password reset link!');
+            Mail::to($request->email)->send(new StudentPasswordResetMail($url, $count));;
+    
+            return back()->with('status', 'We have e-mailed your password reset link!');
       }
 
     /**

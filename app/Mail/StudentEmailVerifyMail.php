@@ -7,10 +7,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 
-class EmailVerificationMail extends Mailable
+class StudentEmailVerifyMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -27,6 +27,19 @@ class EmailVerificationMail extends Mailable
         $this->url = $url;
     }
 
+    // public function studentEmailUrl($user){
+
+    //     $url = URL::temporarySignedRoute(
+    //         'student.verification.verify',
+    //         Carbon::now()->addMinutes(Config::get('student.verification.expire', 60)),
+    //         [
+    //             'id' => $user->id,
+    //             'hash' => sha1($user->email),
+    //         ]
+    //     );
+    //     return $this->build($url);
+    // }
+
     /**
      * Build the message.
      *
@@ -34,9 +47,10 @@ class EmailVerificationMail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('admin.email.auth.EmailVerificationMail')->with([
+        return $this->markdown('student.email.StudentEmailVerifyMail')->with([
             'user' => $this->user,
             'url' => $this->url,
+
         ]);
     }
 }

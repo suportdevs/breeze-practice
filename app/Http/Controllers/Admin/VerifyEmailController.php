@@ -21,7 +21,7 @@ class VerifyEmailController extends Controller
     {
         if(Auth::guard('admin')->check()){
             $user = Admin::where('email', $request->email)->first();
-            dd($user);
+            dd($request->id);
             if(! $user){
                 return redirect()->route('admin.register')->with('errors', 'Invalied URL');
             }
@@ -47,4 +47,9 @@ class VerifyEmailController extends Controller
             return redirect()->intended(RouteServiceProvider::ADMINHOME.'?verified=1');
         }
     }
+
+//     function adminVerify(Request $request)
+//     {
+
+//     }
 }
